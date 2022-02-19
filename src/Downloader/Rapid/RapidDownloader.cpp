@@ -110,7 +110,7 @@ bool CRapidDownloader::download(IDownload* download, int /*max_parallel*/)
 		LOG_DEBUG("skipping non rapid-dl");
 		return true;
 	}
-	//updateRepos(download->origin_name); // Disable another repos update (one happens in search() function above)
+	//updateRepos(download->origin_name); // Disable another repos update (one happens in search() function above, anyway called from main->download())
 	return download_name(download, 0);
 }
 
