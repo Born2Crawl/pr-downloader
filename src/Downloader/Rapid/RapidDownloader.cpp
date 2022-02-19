@@ -84,7 +84,7 @@ bool CRapidDownloader::search(std::list<IDownload*>& result,
 			      const std::string& name,
 			      DownloadEnum::Category cat)
 {
-  LOG_INFO("--== Start ==-- %s", name.c_str());
+	LOG_INFO("--== Start ==-- %s", name.c_str());
 	LOG_DEBUG("%s", name.c_str());
 	updateRepos(name);
 	//sdps.sort(list_compare); // Why sorting if we scan all anyway?
@@ -105,7 +105,7 @@ bool CRapidDownloader::search(std::list<IDownload*>& result,
 
 bool CRapidDownloader::download(IDownload* download, int /*max_parallel*/)
 {
-  LOG_INFO("--== Start ==--");
+	LOG_INFO("--== Start ==--");
 	LOG_DEBUG("%s", download->name.c_str());
 	if (download->dltype != IDownload::TYP_RAPID) { // skip non-rapid downloads
 		LOG_DEBUG("skipping non rapid-dl");
@@ -118,7 +118,7 @@ bool CRapidDownloader::download(IDownload* download, int /*max_parallel*/)
 bool CRapidDownloader::match_download_name(const std::string& str1,
 					   const std::string& str2)
 {
-  LOG_INFO("--== Start ==-- %s; %s", str1.c_str(), str2.c_str());
+	LOG_INFO("--== Start ==-- %s; %s", str1.c_str(), str2.c_str());
 	return str2 == "" || str1 == str2 || str2 == "*";
 	// FIXME: add regex support for win32
 	/*
@@ -217,13 +217,12 @@ bool CRapidDownloader::parse()
 
 bool CRapidDownloader::updateRepos(const std::string& searchstr)
 {
+	LOG_INFO("--== Start ==-- %s", searchstr.c_str());
 	std::string tag = "";
-  LOG_INFO("--== Start ==-- %s", searchstr.c_str());
 	const std::string::size_type pos = searchstr.find(':');
 	if (pos != std::string::npos) { // a tag is found, set it
 	  tag = searchstr.substr(0, pos);
-    LOG_INFO("Tag: %s", tag.c_str());
-		// FIXME: tag isn't used??
+  	LOG_INFO("Tag: %s", tag.c_str());
 	}
 
 	LOG_DEBUG("%s", "Updating repos...");
@@ -235,7 +234,7 @@ bool CRapidDownloader::updateRepos(const std::string& searchstr)
 	std::list<CRepo*> usedrepos;
 	for (CRepo& repo : repos) {
 		LOG_INFO("Trying repo %s", repo.getShortName().c_str());
-		if (repo.getShortName() != tag) {
+		if (tag != "" && repo.getShortName() != tag) {
 			LOG_INFO("Skip!");
 			continue;
 		}
