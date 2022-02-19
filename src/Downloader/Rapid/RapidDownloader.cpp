@@ -97,7 +97,6 @@ bool CRapidDownloader::search(std::list<IDownload*>& result,
 			LOG_INFO("--== addMirror ==-- %s", sdp.getShortName().c_str());
 			dl->addMirror(sdp.getShortName().c_str());
 			result.push_back(dl);
-			return true; // Test stopping immediately on finding a match
 		}
 	}
 	return true;
@@ -242,7 +241,7 @@ bool CRapidDownloader::updateRepos(const std::string& searchstr)
 			delete dl;
 			continue;
 		}
-		LOG_INFO("Will download this repo");
+		LOG_INFO("Will download %s!", repo.getShortName().c_str());
 		usedrepos.push_back(&repo);
 		dls.push_back(dl);
 	}
