@@ -72,7 +72,7 @@ extern void L_LOG(const char* fileName, int line, const char* funName,
 
 	char timestamp[sizeof "9999-12-31 23:59:59.999"];
 	snprintf(timestamp + std::strftime(timestamp, sizeof timestamp - 3, "%F %T.",
-		std::localtime(&coarse)), 4, "%03llu", fine.time_since_epoch().count() % 1000);
+		std::localtime(&coarse)), 4, "%03lu", fine.time_since_epoch().count() % 1000);
 
 	va_list args;
 	va_start(args, format);
