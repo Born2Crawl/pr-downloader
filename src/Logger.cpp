@@ -5,11 +5,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
+#include <chrono>
 
 // Logging functions in standalone mode
 // prdLogRaw is supposed to flush after printing (mostly to stdout/err
 // for progress bars and such).
-static void prdLogRaw(const char* /*fileName*/, int /*line*/, const char* /*funcName*/,
+static void prdLogRaw(const char* /*timestamp*/, const char* /*fileName*/, int /*line*/, const char* /*funcName*/,
                     const char* format, va_list args)
 {
 	vprintf(format, args);
@@ -17,34 +18,34 @@ static void prdLogRaw(const char* /*fileName*/, int /*line*/, const char* /*func
 }
 
 // Normal logging
-static void prdLogError(const char* fileName, int line, const char* funcName,
+static void prdLogError(const char* timestamp, const char* fileName, int line, const char* funcName,
                       const char* format, va_list args)
 {
-	fprintf(stderr, "[Error] %s:%d:%s():", fileName, line, funcName);
+	fprintf(stderr, "%s [Error] %s:%d:%s():", timestamp, fileName, line, funcName);
 	vfprintf(stderr, format, args);
 	fprintf(stderr, "\n");
 }
 
-static void prdLogWarn(const char* fileName, int line, const char* funcName,
+static void prdLogWarn(const char* timestamp, const char* fileName, int line, const char* funcName,
                       const char* format, va_list args)
 {
-	printf("[Warn] %s:%d:%s():", fileName, line, funcName);
+	printf("%s [Warn] %s:%d:%s():", timestamp, fileName, line, funcName);
 	vprintf(format, args);
 	printf("\n");
 }
 
-static void prdLogInfo(const char* fileName, int line, const char* funcName,
+static void prdLogInfo(const char* timestamp, const char* fileName, int line, const char* funcName,
                      const char* format, va_list args)
 {
-	printf("[Info] %s:%d:%s():", fileName, line, funcName);
+	printf("%s [Info] %s:%d:%s():", timestamp, fileName, line, funcName);
 	vprintf(format, args);
 	printf("\n");
 }
 
-static void prdLogDebug(const char* fileName, int line, const char* funcName,
+static void prdLogDebug(const char* timestamp, const char* fileName, int line, const char* funcName,
                       const char* format, va_list args)
 {
-	printf("[Debug] %s:%d:%s():", fileName, line, funcName);
+	printf("%s [Debug] %s:%d:%s():", timestamp, fileName, line, funcName);
 	vprintf(format, args);
 	printf("\n");
 }
@@ -64,24 +65,33 @@ extern void L_LOG(const char* fileName, int line, const char* funName,
 		return;
 	}
 
+	using namespace std::chrono;
+	auto timepoint = system_clock::now();
+	auto coarse = system_clock::to_time_t(timepoint);
+	auto fine = time_point_cast<std::chrono::milliseconds>(timepoint);
+
+	char timestamp[sizeof "9999-12-31 23:59:59.999"];
+	snprintf(timestamp + std::strftime(timestamp, sizeof timestamp - 3, "%F %T.",
+		std::localtime(&coarse)), 4, "%03llu", fine.time_since_epoch().count() % 1000);
+
 	va_list args;
 	va_start(args, format);
 	switch (level) {
 		case L_RAW:
-			prdLogRaw(fileName, line, funName, format, args);
+			prdLogRaw(timestamp, fileName, line, funName, format, args);
 			break;
 		default:
 		case L_ERROR:
-			prdLogError(fileName, line, funName, format, args);
+			prdLogError(timestamp, fileName, line, funName, format, args);
 			break;
 		case L_WARN:
-			prdLogWarn(fileName, line, funName, format, args);
+			prdLogWarn(timestamp, fileName, line, funName, format, args);
 			break;
 		case L_INFO:
-			prdLogInfo(fileName, line, funName, format, args);
+			prdLogInfo(timestamp, fileName, line, funName, format, args);
 			break;
 		case L_DEBUG:
-			prdLogDebug(fileName, line, funName, format, args);
+			prdLogDebug(timestamp, fileName, line, funName, format, args);
 			break;
 	}
 	va_end(args);
