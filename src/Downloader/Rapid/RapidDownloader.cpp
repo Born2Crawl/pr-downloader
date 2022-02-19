@@ -119,7 +119,7 @@ bool CRapidDownloader::match_download_name(const std::string& str1,
 					   const std::string& str2)
 {
 	LOG_INFO("--== Start ==-- %s; %s", str1.c_str(), str2.c_str());
-	return str2 == "" || str1 == str2 || str2 == "*";
+	return str2 == "" || str2 == "*" || str1 == str2;
 	// FIXME: add regex support for win32
 	/*
   #ifndef _WIN32
@@ -233,17 +233,16 @@ bool CRapidDownloader::updateRepos(const std::string& searchstr)
 	std::list<IDownload*> dls;
 	std::list<CRepo*> usedrepos;
 	for (CRepo& repo : repos) {
-		LOG_INFO("Trying repo %s", repo.getShortName().c_str());
+		LOG_INFO("Checking repo %s", repo.getShortName().c_str());
 		if (tag != "" && repo.getShortName() != tag) {
-			LOG_INFO("Skip!");
 			continue;
 		}
-		LOG_INFO("Download!");
 		IDownload* dl = new IDownload();
 		if (!repo.getDownload(*dl)) {
 			delete dl;
 			continue;
 		}
+		LOG_INFO("Will download this repo");
 		usedrepos.push_back(&repo);
 		dls.push_back(dl);
 	}
